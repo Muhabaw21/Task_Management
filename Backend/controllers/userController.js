@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');  
 const bcrypt = require("bcrypt");
-const {Users} = require("../models");
+const {Users, UsersRole} = require("../models");
 
 const asyncHandler = require("express-async-handler");
 
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { id,firstName,lastName, email, password, confirmPassword, dept } = req.body
+    const { id,firstName,lastName, email, password,role, confirmPassword, dept } = req.body
     if (!firstName || !lastName || !email || !password || !confirmPassword || !dept) {
       res.status(400).json({
         path:req.path,
@@ -24,7 +24,19 @@ const registerUser = asyncHandler(async (req, res) => {
       })
       
     }
-  
+   // Check if passwords match
+   if (password !== confirmPassword) {
+    return res.status(400).json({
+      message: 'Passwords do not match',
+    });
+  }
+// Check if the given role is valid
+const userRole = await UsersRole.findOne({ where: { role } });
+if (!userRole) {
+  return res.status(400).json({
+    message: 'Invalid role',
+  });
+}
     // Hash password
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
@@ -38,6 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
       lastName: lastName,
       email:email,
       password: hashedPassword,
+      roleId: userRole.id,
       confirmPassword: confirmHashedPassword,
       dept:dept,
     })
@@ -49,6 +62,7 @@ const registerUser = asyncHandler(async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        role:role,
         dept: user.dept,
       })
     } else {
@@ -60,7 +74,17 @@ const registerUser = asyncHandler(async (req, res) => {
       })
     }
   })
-
+ const getTeachers = async(req, res)=>{
+ try {
+  const teachers = await Users.findAll({where:{roleId:3}});
+  res.status(200).json({
+   teachers
+  });
+ } catch (err) {
+  console.log(err);
+  res.status(500).json({ message: 'Server Error' });
+ }
+ }
 const loginUser = asyncHandler(async(req,res)=>{
     const {email, password} = req.body;
             //check user
@@ -91,13 +115,11 @@ const loginUser = asyncHandler(async(req,res)=>{
             }
 
 const getMe = asyncHandler(async(req,res)=>{
-  const id = req.params.id;
-  const  listOfUSer = await Users.findByPk(id);
+  const  listOfUser = await Users.findAll();
   res.json({
-    username:listOfUSer.username,
-    email: listOfUSer.email
+   listOfUser
   });
 })
      
-module.exports ={registerUser,loginUser, getMe};
+module.exports ={registerUser,loginUser, getMe, getTeachers};
 

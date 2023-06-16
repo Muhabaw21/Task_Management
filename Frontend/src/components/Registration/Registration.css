@@ -7,6 +7,7 @@
     position: absolute;
     width: calc(100% - 300px);
     right: 100px;
+    height: 100vh;
     background-color: rgb(255, 255, 255);
     color: black;
     top: 50px;
@@ -16,12 +17,13 @@
     padding-top: 2px;
     padding-bottom: 3%;
     bottom: 50px;
+    border-radius: 1rem;
 }
 .inner{
     margin-top: 3rem;
 }
 .input-field-container {
-    border-radius: rem;
+   
     margin-top: 5rem;
     border-radius: 1rem;
     display: grid;
@@ -65,7 +67,7 @@ p, input {
     margin: 0rem 2rem;
 }
 .user-button{
-    margin-top: 50px;
+    margin-top: 150px;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -83,7 +85,7 @@ p, input {
     color: white;
     transition: 0.5s;
     margin-bottom: 2rem;
-    margin-left: 35rem;
+    
 }
   .error{
     color: #ff0000;

@@ -2,7 +2,7 @@ import React from 'react'
 import { FaStarOfLife } from 'react-icons/fa';
 import './Registration.css'
 import Swal from 'sweetalert2'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '../Navigation/Navigation';
 const Registration = () => {
   const [firstName, setFirstName] = useState("");
@@ -16,7 +16,9 @@ const Registration = () => {
   const [confirmPassword,setConfirmPassword] = useState("");
   const [confirmPasswordError,setConfirmPasswordError] = useState(null);
   const [dept, setDepartmentName] = useState("");
-  const [departmentNameError, setDepartmentNameError] = useState(null)
+  const [departmentNameError, setDepartmentNameError] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('');
   // create validate function
   const handleName = (event)=>{
     setFirstName(event.target.value);
@@ -41,6 +43,11 @@ const Registration = () => {
   const handleDepartment = (e)=>{
     setDepartmentName(e.target.value)
     setDepartmentNameError("");
+  }
+  function handleRoleChange(event) {
+    const selectedRole = event.target.value;
+    console.log(selectedRole);
+    setSelectedRole(selectedRole);
   }
   const handleSubmit =  async(event) => {
     event.preventDefault();
@@ -82,7 +89,7 @@ const Registration = () => {
            setDepartmentNameError("Department must be at least 3 characters.");
         }
 
-if(firstName && lastName && email  && password && confirmPassword && dept){
+if(firstName && lastName && email  && password && confirmPassword && selectedRole && dept){
   try {
     const response = await fetch("http://localhost:7000/api/users", {
        method: "POST",
@@ -94,6 +101,7 @@ if(firstName && lastName && email  && password && confirmPassword && dept){
         lastName,
         email,
         password,
+        role: selectedRole,// Add selected role to the body object
         confirmPassword,
         dept,
        }),
@@ -117,6 +125,7 @@ if(firstName && lastName && email  && password && confirmPassword && dept){
           setPassword("");
           setConfirmPassword("");
           setDepartmentName("");
+          setSelectedRole("");
         } else {
         
           Swal.fire({
@@ -142,6 +151,15 @@ if(firstName && lastName && email  && password && confirmPassword && dept){
 }
     
   };
+
+
+
+  useEffect(() => {
+    fetch('http://localhost:7000/api/users/role')
+      .then(response => response.json())
+      .then(data => setRoles(data))
+      .catch(error => console.error(error));
+  }, []);
 
 
   return (
@@ -173,6 +191,15 @@ if(firstName && lastName && email  && password && confirmPassword && dept){
                      <input type="password" name="name"  onChange={handlePassword} value={password} placeholder='Enter your password'/>
                      {passwordError && <div className='error'>{passwordError}</div>}
                 </div>
+             <div className='name'>
+                    <p>Your Role  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
+                   <select style = {{marginLeft:"10px"}} value={selectedRole} onChange={handleRoleChange}>
+                          <option value="">Select a role</option>
+                          {roles.map(role => (
+                          <option key={role.id} value={role.role}>{role.role}</option>
+                              ))}
+                    </select>
+             </div>
                 <div className='name'>
                      <p>Confirm Password  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
                       <input type="password" name="name"  onChange={handleConfirmPassword} value={confirmPassword} placeholder='Enter your password'/>
