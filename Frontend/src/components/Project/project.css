@@ -32,7 +32,7 @@
     z-index: 2;
 }
 
-.input-field-container input{
+.input-field-container input, Multiselect{
     position: relative;
   height: 40px;
   width: 100%; 
@@ -49,7 +49,7 @@
     box-shadow: 0px 0px 2px 1px rgba(21, 113, 146, 0.4);
     border: 1px solid rgba(21, 113, 146, 0.4);
 }
-.input-field-container select{
+.input-field-container select, Multiselect{ 
      position: relative;
   height: 40px;
   width: 100%;
@@ -59,11 +59,11 @@
   padding: 0 15px;
   background-color: rgb(242, 242, 242);
 }
-p, input {
+p, input, Multiselect {
     margin-top: 0.2rem;
     margin-left: 1rem;
 }
-.input-field-container .name{
+.input-field-container .name Multiselect{
     margin: 0rem 2rem;
 }
 .card-container {

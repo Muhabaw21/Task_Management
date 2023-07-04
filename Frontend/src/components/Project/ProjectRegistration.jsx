@@ -7,28 +7,17 @@ import axios from 'axios';
 import Swal from 'sweetalert2'
 import swal from "sweetalert";
 import Multiselect from 'multiselect-react-dropdown';
+
 import { useState, useEffect } from 'react';
 import Navigation from '../Navigation/Navigation';
 const Project = () => {
-  const [firstName, setFirstName] = useState("");
-  const [nameError, setNameError] = useState(null);
-  const [lastName, setLastName] = useState("");
-  const [lastNameError, setLastNameError] = useState(null);
-  const [email,setEmail] = useState("");
-  const [emailError,setEmailError] = useState(null);
-  const [password,setPassword] = useState("");
-  const [passwordError,setPasswordError] = useState(null);
-  const [confirmPassword,setConfirmPassword] = useState("");
-  const [confirmPasswordError,setConfirmPasswordError] = useState(null);
-  const [dept, setDepartmentName] = useState("");
-  const [departmentNameError, setDepartmentNameError] = useState(null);
+
   const [project,setProject] = useState([]);
   const [desc,setDesc] = useState([]);
   const [start,setStart] = useState([]);
   const [end,setEnd] = useState([]);
   const[manager,setManager]=useState([]);
   const [status,setStatus] = useState([]);
-  const [selectedManager, setSelectedManager] = useState("");
 
   const handleSubmit = (data)=>{
     console.log(data);
@@ -87,11 +76,10 @@ const Project = () => {
   }
   const handleProject = (event)=>{
     setProject(event.target.value);
-    setNameError("");
   }
   const handleStatus = (event)=>{
     setStatus(event.target.value);
-    setNameError("");
+  
   }
   const handleStart = (e)=>{
     setStart(e.target.value);
@@ -99,57 +87,71 @@ const Project = () => {
   }
   const handleEnd = (e)=>{
     setEnd(e.target.value)
-    setPasswordError("");
+ 
   }
   const handleDesc = (e)=>{
     setDesc(e.target.value)
-    setPasswordError("");
+   
   }
 
   
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filter, setFilter] = useState([]);
   const [filterManager, setfilterMnager] = useState([]);
+
   const [selectedValue, setSelectedValue] = useState([]);
 
+ 
 
-  const onSelect = (selectedList) => {
-    setSelectedValue(selectedList);
-  };
 
-  const onRemove = (selectedList) => {
-    setSelectedValue(selectedList);
-  };
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState('');
+  const [students, setStudents] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState('');
+  const handleTeacherChange = (event) => {
+    console.log('handleTeacherChange called');
+    setSelectedTeacher(event.target.value);
+    console.log('Selected teacher:', event.target.value); // Check the selected teacher value immediately after setting it
+  };
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await axios.get('http://localhost:7000/api/users/teachers');
-      setTeachers(response.data.teachers);
+      try {
+        const response = await axios.get('http://localhost:7000/api/users/teachers');
+        setTeachers(response.data.teachers);
+        console.log('Teachers:', response.data.teachers);
+      } catch (error) {
+        console.log('Error fetching teachers:', error);
+      }
     };
+  
     fetchTeachers();
   }, []);
-
-  const handleTeacherChange = (event) => {
-    setSelectedTeacher(event.target.value);
-  }
-
-  async function fetchAndFilterUsers(roleId) {
-    try {
-      const response = await fetch('http://localhost:7000/api/users/users');
-      const data = await response.json();
-      const filteredUsers = data.listOfUser.filter(user => user.roleId === roleId).map(user => ({
-        ...user,
-        userIdAndRoleId: `${user.id}-${user.roleId}`
-      }));
-      setFilteredUsers(filteredUsers);
-    } catch (error) {
-      console.error('Error fetching and filtering users:', error);
-    }
-  }
+  
   useEffect(() => {
-    fetchAndFilterUsers(2);
+    console.log('selectedTeacher:', selectedTeacher); // Check the selected teacher value whenever it changes
+  }, [selectedTeacher]);
+  
+  useEffect(() => {
+    const fetchStudents = async () => {
+      const response = await axios.get('http://localhost:7000/api/users/students');
+      setStudents(response.data.students);
+    };
+    fetchStudents();
   }, []);
+
+
+
+  const onSelect = (selectedList, selectedItem) => {
+    setSelectedStudents(selectedList);
+  };
+
+  const onRemove = (selectedList, removedItem) => {
+    setSelectedStudents(selectedList);
+  }
+ 
+  console.log('Rendered');
+
+  
   const options1 = filterManager.map(user => ({
     value: user.id,
     label: user.firstName
@@ -207,26 +209,21 @@ const Project = () => {
               
               </div>
              
-            
               <div className="name">
-
-                    <p> Manager  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
-                    <select value={selectedTeacher} onChange={handleTeacherChange}>
-        {teachers.map((teacher) => (
-          <option key={teacher.id} value={`${teacher.firstName} ${teacher.lastName}`}>
-            {teacher.firstName} {teacher.lastName}
-          </option>
-        ))}
-      </select>
-                    </div>                               
+    <p>Manager <FaStarOfLife style={{ marginBottom: "2px" }} size="0.5rem" color="red" /></p>
+    <select value={selectedTeacher} onChange={handleTeacherChange}>
+      <option value="">Select a manager</option>
+      {teachers.map((teacher) => (
+        <option key={teacher.id} value={`${teacher.firstName} ${teacher.lastName}`}>
+          {teacher.firstName} {teacher.lastName}
+        </option>
+      ))}
+    </select>
+  </div>                             
                 <div className='user-button'>
-                       <button type = 'submit' className='add' >Register</button>
-                 </div>
-                 
-                
+                 <button type = 'submit' className='add' >Register</button>
+                 </div>                   
              </div>
-            
-   
           </div>
     
 

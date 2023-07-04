@@ -1,8 +1,10 @@
 import React from 'react'
 import './home.css'
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import ProgressBar from './ProgressBar';
 import Navigation from '../Navigation/Navigation'
+import axios from 'axios';
 const Home = () => {
        const [progress, setProgress] = useState(0);
 
@@ -21,7 +23,15 @@ const Home = () => {
     // cleanup
     return () => clearInterval(interval);
   }, []);
-
+const[projects, setProjects] =useState([])
+  const projectTitle= async()=>{
+    const response = await axios.get("http://localhost:7000/api/users/projects");
+   
+    setProjects(response.data.projects);
+  }
+  useEffect(()=>{
+  projectTitle();
+  },[])
   return (
        
    <div>
@@ -45,85 +55,25 @@ const Home = () => {
                                  
           </div>
           <div className="project-content">
-                <div className='project-card'>
-                  <div className="project">
-                       
-                        <h3 className="project-title">Cargo Management</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                 </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">Employee Management</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">Project Management</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">Driver Management</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">Vehicle Management</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">TMS</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-                <div className='project-card'>
-                  <div className="project">
-                        <h3 className="project-title">VPN/LAN</h3>  
-                        <span className='deadline'>10 days left</span> 
-                      </div>
-                                <ProgressBar value={60} />
-                  <div className='group-member'>
-                          <div className="horizontal-line"></div>
-                                <p className='total-member'>+2</p>
-                              </div>
-                     </div>
-              
+    
+{projects.length > 0 && (
+  projects.map((user) => (
+    <Link to="/projects" key={user.id}>
+      <div className='project-card'>
+        <div className="project">  
+          <h3 className="project-title">{user.projectName}</h3>                       
+          <span className='deadline'>10 days left</span> 
+        </div>
+        <ProgressBar value={60} />
+        <div className='group-member'>
+          <div className="horizontal-line"></div>
+          <p className='total-member'>+2</p>
+        </div>
+      </div>
+    </Link>
+  ))
+)}
+
          </div>     
        </div>
    </div>
