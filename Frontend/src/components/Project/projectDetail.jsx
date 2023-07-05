@@ -4,6 +4,8 @@ import { FaStarOfLife } from 'react-icons/fa';
 import axios from 'axios'
 import './projectDetail.css';
 import { Pagination } from 'antd';
+import swal from "sweetalert";
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 import Navigation from '../Navigation/Navigation';
 
 const ProjectDetail = () => {
@@ -14,7 +16,11 @@ const ProjectDetail = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalTasks, setTotalTasks] = useState(0);
   const [pageSize, setPageSize] = useState(5);
-
+  const [popup, setPopup] = useState(false);
+  const [taskName, setTaskName] = useState(null);
+  const [taskDesc, setTaskDesc] = useState(null);
+  const [dueDate, setDueDate]= useState(null);
+  const [popup1, setPop1] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,11 +40,58 @@ const ProjectDetail = () => {
   
     fetchData();
   }, [id]);
-  
+  const addTask = async()=>{
+    let items = {
+      taskName,
+      projectId:id,
+      taskDescription: taskDesc,
+      dueDate,
+    };
+    
+             let options= {
+              method:"POST",
+              headers:{
+                'Content-Type':"application/json",
+                'accept':"application/json"
+              },
+              body:JSON.stringify(items),
+            };
+            const url = "http://localhost:7000/api/tasks/tasks"
+            try {
+             const response = await fetch(url, options); 
+             const result = await response.json();
+             console.log(result);
+             localStorage.setItem("message", JSON.stringify(result['message']));
+             const mess =localStorage.getItem("message");
+             if(response.ok){
+                 console.log("Task add successfully");
+                 swal("Successful",`$mess`,"success",
+                {
+                  button:false,
+                  timer:2000
+                }
+
+                 );
+                 setTaskName("");
+                 setTaskDesc("");
+                 setDueDate("");
+                
+
+             }
+             else{
+              console.log("failed");
+              swal(`Failed To Register ${mess}`, "Error", "error");
+             }
+            } catch (error) {
+              console.error(error);
+            }
+  }
   const handlePageChange = (pageNumber) => {
   setCurrentPage(pageNumber);
-}
-
+     }
+ const handleClickOpen = ()=>{
+  setPopup(true);
+     }
 
   
   const handleItemChange = (event) => {
@@ -49,12 +102,15 @@ const ProjectDetail = () => {
     });
     console.log(`Handle Change :    item`); // log the item variable after updating it
   };
-  
+  const closePopup5 = () => {
+    setPop1(false);
+    setPopup(false);
+}
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Submit the item data to the API endpoint
-   // console.log(item);
+    addTask();
   };
   return (
     <div>
@@ -121,7 +177,7 @@ const ProjectDetail = () => {
   readOnly
 />
 </div>
-                <div className="input">
+<div className="input">
 <label>
   Status{' '}
 
@@ -154,7 +210,45 @@ const ProjectDetail = () => {
     ) : (
       ''
     )}
+        <div className='user-task-button'>
+    <Link to="#"><button onClick={() => {handleClickOpen()}}>Add Task</button></Link>
+                 </div>   
     <div>
+  
+
+      <form onSubmit={handleSubmit}>
+        {
+          popup?
+          <div className='container_task'>
+                <div className='animate__animated animate__slideInDown'>
+                  <div className='popupInner'>  
+                  <button className="closeBtn" onClick={closePopup5}>X</button>          
+          <div className='inner'>
+             <div className=" input-field-container inner">
+             <div className='name'>
+                    <p>Task Name  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
+                    <input type="text" name="task"  onChange={(e)=>setTaskName(e.target.value)} value = {taskName} placeholder='Enter Task name'/>                 
+              </div>
+              <div className='name'>
+                 <p> Task Description  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
+                  <input type="text" name="date"  onChange = {(e)=>setTaskDesc(e.target.value)} value = {taskDesc} placeholder='Enter task description '/>
+             
+               </div>
+               <div className='name'>
+                    <p>Due Date  <FaStarOfLife style={{marginBottom:"2px"}}  size="0.5rem" color='red'></FaStarOfLife></p>
+                     <input type="date" name="name"  onChange={(e)=>setDueDate(e.target.value)} value={dueDate} placeholder='Enter due date'/>
+                 
+                </div>
+                <div className='user-button'>
+                 <button type = 'submit' className='add' >Submit</button>
+                 </div>                   
+             </div>
+          </div>
+                  </div>
+                </div>   
+        </div>:""
+        }
+      </form>
      <p>Total Tasks</p>
                 <div className="table_container">
                   <table className="task_table">
